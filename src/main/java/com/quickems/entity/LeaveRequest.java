@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "leave_requests")
 @Getter
 @Setter
 @NoArgsConstructor
