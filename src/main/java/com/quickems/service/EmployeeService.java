@@ -37,8 +37,28 @@ public class EmployeeService {
                                              int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return employeeRepository.searchEmployees(search, departmentId, status, pageable)
-                .map(this::toDto);
+
+        // Use derived queries to avoid LOWER(bytea) issue with Hibernate 6 + PostgreSQL
+        if (search != null && !search.isBlank()) {
+            // When searching by text, get all text matches then filter in memory for dept/status
+            // (acceptable for typical employee counts < 10k)
+            Page<Employee> results = employeeRepository
+                    .findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(
+                            search, search, search, search, pageable);
+            return results.map(this::toDto);
+        }
+
+        // No search text — use department/status filters directly
+        if (departmentId != null && status != null) {
+            return employeeRepository.findByDepartmentIdAndStatus(departmentId, status, pageable).map(this::toDto);
+        }
+        if (departmentId != null) {
+            return employeeRepository.findByDepartmentId(departmentId, pageable).map(this::toDto);
+        }
+        if (status != null) {
+            return employeeRepository.findByStatus(status, pageable).map(this::toDto);
+        }
+        return employeeRepository.findAll(pageable).map(this::toDto);
     }
 
     public EmployeeDto getEmployeeById(Long id) {

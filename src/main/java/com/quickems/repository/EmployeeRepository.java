@@ -22,28 +22,17 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByStatus(EmploymentStatus status);
     long countByDepartmentId(Long departmentId);
 
-    /**
-     * JPQL query — database-agnostic, works on both MySQL and PostgreSQL.
-     * Avoids CAST AS string / CAST AS int which cause type errors on PostgreSQL.
-     * Uses LOWER() directly on String entity fields — no cast needed in JPQL.
-     */
-    @Query("""
-            SELECT e FROM Employee e
-            WHERE
-              (:search IS NULL
-               OR LOWER(e.firstName)  LIKE LOWER(CONCAT('%', :search, '%'))
-               OR LOWER(e.lastName)   LIKE LOWER(CONCAT('%', :search, '%'))
-               OR LOWER(e.email)      LIKE LOWER(CONCAT('%', :search, '%'))
-               OR LOWER(e.employeeId) LIKE LOWER(CONCAT('%', :search, '%')))
-              AND (:departmentId IS NULL OR e.department.id = :departmentId)
-              AND (:status IS NULL     OR e.status = :status)
-            """)
-    Page<Employee> searchEmployees(@Param("search") String search,
-                                   @Param("departmentId") Long departmentId,
-                                   @Param("status") EmploymentStatus status,
-                                   Pageable pageable);
+    // ── Derived queries instead of custom JPQL for simple filters ──────────
+    Page<Employee> findByDepartmentIdAndStatus(Long departmentId, EmploymentStatus status, Pageable pageable);
+    Page<Employee> findByDepartmentId(Long departmentId, Pageable pageable);
+    Page<Employee> findByStatus(EmploymentStatus status, Pageable pageable);
 
-    @Query("SELECT e.department.name, COUNT(e) FROM Employee e GROUP BY e.department.name")
+    // ── Search by text fields ────────────────────────────────────────────────
+    Page<Employee> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(
+            String firstName, String lastName, String email, String employeeId, Pageable pageable);
+
+    // ── Stats queries ────────────────────────────────────────────────────────
+    @Query("SELECT e.department.name, COUNT(e) FROM Employee e WHERE e.department IS NOT NULL GROUP BY e.department.name")
     List<Object[]> countByDepartment();
 
     @Query("SELECT e.status, COUNT(e) FROM Employee e GROUP BY e.status")
