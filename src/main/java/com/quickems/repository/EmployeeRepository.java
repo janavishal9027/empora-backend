@@ -51,6 +51,6 @@ AND (:status IS NULL OR e.status = :status)
     @Query("SELECT COUNT(e) FROM Employee e WHERE e.hireDate >= :startDate AND e.hireDate <= :endDate")
     long countNewHires(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT MAX(CAST(SUBSTRING(e.employeeId, 5) AS int)) FROM Employee e WHERE e.employeeId LIKE 'EMP-%'")
+    @Query(value = "SELECT MAX(CAST(SUBSTRING(employee_id, 5) AS INTEGER)) FROM employees WHERE employee_id LIKE 'EMP-%'", nativeQuery = true)
     Integer findMaxEmployeeIdNumber();
 }
