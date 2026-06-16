@@ -23,38 +23,24 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByDepartmentId(Long departmentId);
 
     /**
-     * Native PostgreSQL query.
-     * Uses COALESCE to handle NULL search safely without type ambiguity.
-     * :search     — nullable String  (pass null to skip search filter)
-     * :departmentId — nullable Long  (pass null to skip dept filter)
-     * :status     — nullable String  (pass null to skip status filter)
+     * JPQL query — database-agnostic, works on both MySQL and PostgreSQL.
+     * Avoids CAST AS string / CAST AS int which cause type errors on PostgreSQL.
+     * Uses LOWER() directly on String entity fields — no cast needed in JPQL.
      */
-    @Query(value = """
-            SELECT * FROM employees e
+    @Query("""
+            SELECT e FROM Employee e
             WHERE
-              (CAST(:search AS TEXT) IS NULL
-               OR LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
-               OR LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
-               OR LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
-               OR LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
-              AND (CAST(:departmentId AS BIGINT) IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
-              AND (CAST(:status AS TEXT) IS NULL OR e.status = CAST(:status AS TEXT))
-            """,
-            countQuery = """
-            SELECT COUNT(*) FROM employees e
-            WHERE
-              (CAST(:search AS TEXT) IS NULL
-               OR LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
-               OR LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
-               OR LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
-               OR LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
-              AND (CAST(:departmentId AS BIGINT) IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
-              AND (CAST(:status AS TEXT) IS NULL OR e.status = CAST(:status AS TEXT))
-            """,
-            nativeQuery = true)
+              (:search IS NULL
+               OR LOWER(e.firstName)  LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(e.lastName)   LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(e.email)      LIKE LOWER(CONCAT('%', :search, '%'))
+               OR LOWER(e.employeeId) LIKE LOWER(CONCAT('%', :search, '%')))
+              AND (:departmentId IS NULL OR e.department.id = :departmentId)
+              AND (:status IS NULL     OR e.status = :status)
+            """)
     Page<Employee> searchEmployees(@Param("search") String search,
                                    @Param("departmentId") Long departmentId,
-                                   @Param("status") String status,
+                                   @Param("status") EmploymentStatus status,
                                    Pageable pageable);
 
     @Query("SELECT e.department.name, COUNT(e) FROM Employee e GROUP BY e.department.name")
