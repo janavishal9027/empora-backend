@@ -7,6 +7,7 @@ import lombok.*;
 import java.util.List;
 
 @Entity
+@Table(name = "departments")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,9 +20,10 @@ public class Department {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(name = "name", nullable = false, unique = true, length = 150)
     private String name;
 
+    @Column(name = "description", length = 500)
     private String description;
 
     @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)

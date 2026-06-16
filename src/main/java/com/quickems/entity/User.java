@@ -22,34 +22,35 @@ public class User {
     private Long id;
 
     @NotBlank
+    @Column(name = "full_name", nullable = false, length = 150)
     private String fullName;
 
     @Email
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "role", nullable = false, length = 20)
     private Role role;
 
+    @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
-    /** Raw (plain) temporary password — stored only until employee sets their own password */
+    @Column(name = "temporary_password", length = 255)
     private String temporaryPassword;
 
-    /** When the temporary password expires (1 hour after generation) */
+    @Column(name = "temp_password_expiry")
     private LocalDateTime tempPasswordExpiry;
 
-    /** True once the employee has set their own permanent password */
-    @Column(nullable = false)
+    @Column(name = "password_set", nullable = false)
     private boolean passwordSet = false;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

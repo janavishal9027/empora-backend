@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "employees")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,52 +24,60 @@ public class Employee {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "first_name", nullable = false, length = 100)
     private String firstName;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
     @Email
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
+    @Column(name = "phone", length = 50)
     private String phone;
 
-    @Column(nullable = false, unique = true)
-    private String employeeId; // e.g., EMP-0001
+    @Column(name = "employee_id", nullable = false, unique = true, length = 20)
+    private String employeeId;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "gender", length = 10)
     private Gender gender;
 
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Column(name = "address", length = 500)
     private String address;
 
     @NotBlank
+    @Column(name = "job_title", nullable = false, length = 150)
     private String jobTitle;
 
     @DecimalMin("0.0")
-    @Column(precision = 12, scale = 2)
+    @Column(name = "salary", precision = 12, scale = 2)
     private BigDecimal salary;
 
+    @Column(name = "hire_date")
     private LocalDate hireDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false, length = 20)
     private EmploymentStatus status;
 
+    @Column(name = "profile_image_url", length = 500)
     private String profileImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
     private Department department;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist
