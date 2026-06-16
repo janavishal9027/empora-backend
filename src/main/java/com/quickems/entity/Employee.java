@@ -24,36 +24,36 @@ public class Employee {
     private Long id;
 
     @NotBlank
-    @Column(name = "first_name", nullable = false, length = 100)
+    @Column(name = "first_name", nullable = false, columnDefinition = "varchar(100)")
     private String firstName;
 
     @NotBlank
-    @Column(name = "last_name", nullable = false, length = 100)
+    @Column(name = "last_name", nullable = false, columnDefinition = "varchar(100)")
     private String lastName;
 
     @Email
     @NotBlank
-    @Column(name = "email", nullable = false, unique = true, length = 255)
+    @Column(name = "email", nullable = false, unique = true, columnDefinition = "varchar(255)")
     private String email;
 
-    @Column(name = "phone", length = 50)
+    @Column(name = "phone", columnDefinition = "varchar(50)")
     private String phone;
 
-    @Column(name = "employee_id", nullable = false, unique = true, length = 20)
+    @Column(name = "employee_id", nullable = false, unique = true, columnDefinition = "varchar(20)")
     private String employeeId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", length = 10)
+    @Column(name = "gender", columnDefinition = "varchar(10)")
     private Gender gender;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "address", length = 500)
+    @Column(name = "address", columnDefinition = "varchar(500)")
     private String address;
 
     @NotBlank
-    @Column(name = "job_title", nullable = false, length = 150)
+    @Column(name = "job_title", nullable = false, columnDefinition = "varchar(150)")
     private String jobTitle;
 
     @DecimalMin("0.0")
@@ -64,10 +64,10 @@ public class Employee {
     private LocalDate hireDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, columnDefinition = "varchar(20)")
     private EmploymentStatus status;
 
-    @Column(name = "profile_image_url", length = 500)
+    @Column(name = "profile_image_url", columnDefinition = "varchar(500)")
     private String profileImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)

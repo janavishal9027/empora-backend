@@ -26,7 +26,7 @@ public class LeaveRequest {
     private Employee employee;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "leave_type", nullable = false, length = 20)
+    @Column(name = "leave_type", nullable = false, columnDefinition = "varchar(20)")
     private LeaveType leaveType;
 
     @Column(name = "start_date", nullable = false)
@@ -35,14 +35,14 @@ public class LeaveRequest {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "reason", length = 500)
+    @Column(name = "reason", columnDefinition = "varchar(500)")
     private String reason;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, columnDefinition = "varchar(20)")
     private LeaveStatus status;
 
-    @Column(name = "review_comment", length = 500)
+    @Column(name = "review_comment", columnDefinition = "varchar(500)")
     private String reviewComment;
 
     @Column(name = "applied_at", updatable = false)

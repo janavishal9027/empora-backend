@@ -22,26 +22,26 @@ public class User {
     private Long id;
 
     @NotBlank
-    @Column(name = "full_name", nullable = false, length = 150)
+    @Column(name = "full_name", nullable = false, columnDefinition = "varchar(150)")
     private String fullName;
 
     @Email
     @NotBlank
-    @Column(name = "email", nullable = false, unique = true, length = 255)
+    @Column(name = "email", nullable = false, unique = true, columnDefinition = "varchar(255)")
     private String email;
 
     @NotBlank
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", nullable = false, columnDefinition = "varchar(255)")
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
+    @Column(name = "role", nullable = false, columnDefinition = "varchar(20)")
     private Role role;
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
-    @Column(name = "temporary_password", length = 255)
+    @Column(name = "temporary_password", columnDefinition = "varchar(255)")
     private String temporaryPassword;
 
     @Column(name = "temp_password_expiry")

@@ -20,10 +20,10 @@ public class Department {
     private Long id;
 
     @NotBlank
-    @Column(name = "name", nullable = false, unique = true, length = 150)
+    @Column(name = "name", nullable = false, unique = true, columnDefinition = "varchar(150)")
     private String name;
 
-    @Column(name = "description", length = 500)
+    @Column(name = "description", columnDefinition = "varchar(500)")
     private String description;
 
     @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
