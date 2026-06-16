@@ -37,7 +37,9 @@ public class EmployeeService {
                                              int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return employeeRepository.searchEmployees(search, departmentId, status, pageable)
+        // Pass status as String for native query compatibility with PostgreSQL
+        String statusStr = status != null ? status.name() : null;
+        return employeeRepository.searchEmployees(search, departmentId, statusStr, pageable)
                 .map(this::toDto);
     }
 

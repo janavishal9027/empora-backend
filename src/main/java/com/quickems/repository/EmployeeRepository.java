@@ -17,30 +17,42 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     Optional<Employee> findByEmail(String email);
-
     Optional<Employee> findByEmployeeId(String employeeId);
-
     boolean existsByEmail(String email);
-
     long countByStatus(EmploymentStatus status);
-
     long countByDepartmentId(Long departmentId);
 
-    @Query("""
-SELECT e FROM Employee e
-WHERE
-(:search IS NULL OR
-LOWER(CAST(e.firstName AS string)) LIKE CONCAT('%', LOWER(:search), '%') OR
-LOWER(CAST(e.lastName AS string)) LIKE CONCAT('%', LOWER(:search), '%') OR
-LOWER(CAST(e.email AS string)) LIKE CONCAT('%', LOWER(:search), '%') OR
-LOWER(CAST(e.employeeId AS string)) LIKE CONCAT('%', LOWER(:search), '%'))
-AND (:departmentId IS NULL OR e.department.id = :departmentId)
-AND (:status IS NULL OR e.status = :status)
-""")
+    /**
+     * Native PostgreSQL query using || for string concatenation (CONCAT not reliable in all PG versions).
+     * status is passed as String so it works with native query.
+     */
+    @Query(value = """
+            SELECT * FROM employees e
+            WHERE
+              (:search IS NULL OR
+               LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
+               LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
+               LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
+               LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
+              AND (:departmentId IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
+              AND (:status IS NULL OR e.status = CAST(:status AS VARCHAR))
+            """,
+            countQuery = """
+            SELECT COUNT(*) FROM employees e
+            WHERE
+              (:search IS NULL OR
+               LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
+               LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
+               LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
+               LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
+              AND (:departmentId IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
+              AND (:status IS NULL OR e.status = CAST(:status AS VARCHAR))
+            """,
+            nativeQuery = true)
     Page<Employee> searchEmployees(@Param("search") String search,
-                                    @Param("departmentId") Long departmentId,
-                                    @Param("status") EmploymentStatus status,
-                                    Pageable pageable);
+                                   @Param("departmentId") Long departmentId,
+                                   @Param("status") String status,
+                                   Pageable pageable);
 
     @Query("SELECT e.department.name, COUNT(e) FROM Employee e GROUP BY e.department.name")
     List<Object[]> countByDepartment();
@@ -51,6 +63,7 @@ AND (:status IS NULL OR e.status = :status)
     @Query("SELECT COUNT(e) FROM Employee e WHERE e.hireDate >= :startDate AND e.hireDate <= :endDate")
     long countNewHires(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    @Query(value = "SELECT MAX(CAST(SUBSTRING(employee_id, 5) AS INTEGER)) FROM employees WHERE employee_id LIKE 'EMP-%'", nativeQuery = true)
+    @Query(value = "SELECT MAX(CAST(SUBSTRING(employee_id, 5) AS INTEGER)) FROM employees WHERE employee_id LIKE 'EMP-%'",
+           nativeQuery = true)
     Integer findMaxEmployeeIdNumber();
 }
