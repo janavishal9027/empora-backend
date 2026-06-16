@@ -23,30 +23,33 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByDepartmentId(Long departmentId);
 
     /**
-     * Native PostgreSQL query using || for string concatenation (CONCAT not reliable in all PG versions).
-     * status is passed as String so it works with native query.
+     * Native PostgreSQL query.
+     * Uses COALESCE to handle NULL search safely without type ambiguity.
+     * :search     — nullable String  (pass null to skip search filter)
+     * :departmentId — nullable Long  (pass null to skip dept filter)
+     * :status     — nullable String  (pass null to skip status filter)
      */
     @Query(value = """
             SELECT * FROM employees e
             WHERE
-              (:search IS NULL OR
-               LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
-               LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
-               LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
-               LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
-              AND (:departmentId IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
-              AND (:status IS NULL OR e.status = CAST(:status AS VARCHAR))
+              (CAST(:search AS TEXT) IS NULL
+               OR LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
+               OR LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
+               OR LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
+               OR LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
+              AND (CAST(:departmentId AS BIGINT) IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
+              AND (CAST(:status AS TEXT) IS NULL OR e.status = CAST(:status AS TEXT))
             """,
             countQuery = """
             SELECT COUNT(*) FROM employees e
             WHERE
-              (:search IS NULL OR
-               LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
-               LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
-               LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%' OR
-               LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
-              AND (:departmentId IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
-              AND (:status IS NULL OR e.status = CAST(:status AS VARCHAR))
+              (CAST(:search AS TEXT) IS NULL
+               OR LOWER(e.first_name)  LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
+               OR LOWER(e.last_name)   LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
+               OR LOWER(e.email)       LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%'
+               OR LOWER(e.employee_id) LIKE '%' || LOWER(CAST(:search AS TEXT)) || '%')
+              AND (CAST(:departmentId AS BIGINT) IS NULL OR e.department_id = CAST(:departmentId AS BIGINT))
+              AND (CAST(:status AS TEXT) IS NULL OR e.status = CAST(:status AS TEXT))
             """,
             nativeQuery = true)
     Page<Employee> searchEmployees(@Param("search") String search,
