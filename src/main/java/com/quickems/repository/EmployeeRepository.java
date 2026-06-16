@@ -26,13 +26,17 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     long countByDepartmentId(Long departmentId);
 
-    @Query("SELECT e FROM Employee e WHERE " +
-           "(:search IS NULL OR LOWER(e.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(e.lastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(e.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(e.employeeId) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
-           "(:departmentId IS NULL OR e.department.id = :departmentId) AND " +
-           "(:status IS NULL OR e.status = :status)")
+    @Query("""
+SELECT e FROM Employee e
+WHERE
+(:search IS NULL OR
+LOWER(CAST(e.firstName AS string)) LIKE CONCAT('%', LOWER(:search), '%') OR
+LOWER(CAST(e.lastName AS string)) LIKE CONCAT('%', LOWER(:search), '%') OR
+LOWER(CAST(e.email AS string)) LIKE CONCAT('%', LOWER(:search), '%') OR
+LOWER(CAST(e.employeeId AS string)) LIKE CONCAT('%', LOWER(:search), '%'))
+AND (:departmentId IS NULL OR e.department.id = :departmentId)
+AND (:status IS NULL OR e.status = :status)
+""")
     Page<Employee> searchEmployees(@Param("search") String search,
                                     @Param("departmentId") Long departmentId,
                                     @Param("status") EmploymentStatus status,
