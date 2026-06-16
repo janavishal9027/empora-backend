@@ -1,18 +1,13 @@
 # ── Stage 1: Build ──────────────────────────────────────────
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 
 WORKDIR /app
 
-# Copy Maven wrapper and pom first (layer cache for dependencies)
+# Copy pom first — download dependencies (cached unless pom.xml changes)
 COPY pom.xml ./
-COPY .mvn/ .mvn/ 2>/dev/null || true
-COPY mvnw* ./
+RUN mvn dependency:go-offline -q
 
-# Download dependencies (cached unless pom.xml changes)
-RUN apk add --no-cache maven && \
-    mvn dependency:go-offline -q || true
-
-# Copy source and build
+# Copy source and build jar
 COPY src ./src
 RUN mvn clean package -DskipTests -q
 
@@ -21,7 +16,6 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy the built jar from builder stage
 COPY --from=builder /app/target/employee-management-system-1.0.0.jar app.jar
 
 EXPOSE 8080
