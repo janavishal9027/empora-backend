@@ -1,6 +1,6 @@
 package com.quickems.config;
 
-import com.quickems.entity.User;
+import com.quickems.entity.Users;
 import com.quickems.enums.Role;
 import com.quickems.repository.DepartmentRepository;
 import com.quickems.repository.EmployeeRepository;
@@ -48,7 +48,7 @@ public class DataSeeder implements CommandLineRunner {
                 log.info("Updated user: {}", email);
             },
             () -> {
-                User user = User.builder()
+                Users user = Users.builder()
                         .fullName(fullName)
                         .email(email)
                         .password(passwordEncoder.encode(rawPassword))

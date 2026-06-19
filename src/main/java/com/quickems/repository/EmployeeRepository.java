@@ -4,6 +4,7 @@ import com.quickems.entity.Employee;
 import com.quickems.enums.EmploymentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,11 +24,17 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByDepartmentId(Long departmentId);
 
     // ── Derived queries instead of custom JPQL for simple filters ──────────
+    @EntityGraph(attributePaths = {"department"})
     Page<Employee> findByDepartmentIdAndStatus(Long departmentId, EmploymentStatus status, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"department"})
     Page<Employee> findByDepartmentId(Long departmentId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"department"})
     Page<Employee> findByStatus(EmploymentStatus status, Pageable pageable);
 
     // ── Search by text fields ────────────────────────────────────────────────
+    @EntityGraph(attributePaths = {"department"})
     Page<Employee> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrEmployeeIdContainingIgnoreCase(
             String firstName, String lastName, String email, String employeeId, Pageable pageable);
 

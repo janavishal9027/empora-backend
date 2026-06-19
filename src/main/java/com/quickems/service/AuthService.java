@@ -3,7 +3,7 @@ package com.quickems.service;
 import com.quickems.dto.auth.AuthResponse;
 import com.quickems.dto.auth.LoginRequest;
 import com.quickems.dto.auth.SetPasswordRequest;
-import com.quickems.entity.User;
+import com.quickems.entity.Users;
 import com.quickems.repository.UserRepository;
 import com.quickems.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+        Users user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
         // ── Case 1: Employee whose password is not yet set — authenticate via temp password ──
@@ -83,7 +83,7 @@ public class AuthService {
      */
     @Transactional
     public AuthResponse setPassword(String email, SetPasswordRequest request) {
-        User user = userRepository.findByEmail(email)
+        Users user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException("User not found"));
 
         if (user.isPasswordSet()) {
@@ -120,7 +120,7 @@ public class AuthService {
     }
 
     /** Build Spring Security UserDetails from our User entity */
-    private UserDetails buildUserDetails(User user) {
+    private UserDetails buildUserDetails(Users user) {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())

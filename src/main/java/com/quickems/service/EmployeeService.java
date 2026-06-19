@@ -4,7 +4,7 @@ import com.quickems.dto.EmployeeDto;
 import com.quickems.dto.EmployeeRequest;
 import com.quickems.entity.Department;
 import com.quickems.entity.Employee;
-import com.quickems.entity.User;
+import com.quickems.entity.Users;
 import com.quickems.enums.EmploymentStatus;
 import com.quickems.enums.Role;
 import com.quickems.exception.DuplicateResourceException;
@@ -33,6 +33,7 @@ public class EmployeeService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public Page<EmployeeDto> getAllEmployees(String search, Long departmentId, EmploymentStatus status,
                                              int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
@@ -102,7 +103,7 @@ public class EmployeeService {
         String tempPwd = generateSecurePassword();
 
         // Create user account with the auto-generated temporary password
-        User user = User.builder()
+        Users user = Users.builder()
                 .fullName(request.getFirstName() + " " + request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(tempPwd))
@@ -172,7 +173,7 @@ public class EmployeeService {
     @Transactional
     public String generateTemporaryPassword(Long employeeId, String newTempPassword) {
         Employee employee = findById(employeeId);
-        User user = userRepository.findByEmail(employee.getEmail())
+        Users user = userRepository.findByEmail(employee.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("No user account found for employee"));
 
         if (user.isPasswordSet()) {

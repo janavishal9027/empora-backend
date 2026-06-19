@@ -1,6 +1,6 @@
 package com.quickems.controller;
 
-import com.quickems.entity.User;
+import com.quickems.entity.Users;
 import com.quickems.enums.Role;
 import com.quickems.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,7 @@ public class SetupController {
                 result.put(email, "reset");
             },
             () -> {
-                User u = User.builder()
+                Users u = Users.builder()
                         .fullName(fullName)
                         .email(email)
                         .password(passwordEncoder.encode(rawPassword))
