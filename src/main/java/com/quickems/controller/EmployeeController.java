@@ -65,14 +65,12 @@ public class EmployeeController {
 
     /**
      * Admin generates a new temporary password for an employee whose previous one expired.
-     * Returns the generated plain-text password so the admin can share it.
+     * Backend auto-generates a secure password and returns it.
      */
     @PostMapping("/{id}/generate-temp-password")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<java.util.Map<String, String>> generateTempPassword(
-            @PathVariable Long id,
-            @RequestParam String temporaryPassword) {
-        String result = employeeService.generateTemporaryPassword(id, temporaryPassword);
+    public ResponseEntity<java.util.Map<String, String>> generateTempPassword(@PathVariable Long id) {
+        String result = employeeService.generateTemporaryPassword(id);
         return ResponseEntity.ok(java.util.Map.of(
                 "message", "Temporary password generated. Valid for 1 hour.",
                 "temporaryPassword", result

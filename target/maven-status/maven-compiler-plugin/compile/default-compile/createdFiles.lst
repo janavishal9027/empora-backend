@@ -7,10 +7,10 @@ com\quickems\dto\DepartmentDto.class
 com\quickems\dto\auth\AuthResponse$AuthResponseBuilder.class
 com\quickems\dto\auth\SetPasswordRequest.class
 com\quickems\entity\LeaveRequest.class
+com\quickems\entity\Users$UsersBuilder.class
 com\quickems\entity\Department.class
 com\quickems\exception\ResourceNotFoundException.class
 com\quickems\repository\EmployeeRepository.class
-com\quickems\entity\User$UserBuilder.class
 com\quickems\service\EmployeeService.class
 com\quickems\config\DataSeeder.class
 com\quickems\exception\GlobalExceptionHandler.class
@@ -26,6 +26,7 @@ com\quickems\service\DepartmentService.class
 com\quickems\enums\EmploymentStatus.class
 com\quickems\dto\DepartmentRequest$DepartmentRequestBuilder.class
 com\quickems\dto\LeaveRequestCreate$LeaveRequestCreateBuilder.class
+com\quickems\entity\Users.class
 com\quickems\repository\LeaveRequestRepository.class
 com\quickems\config\SecurityConfig.class
 com\quickems\controller\EmployeeController.class
@@ -39,7 +40,6 @@ com\quickems\dto\DashboardStats.class
 com\quickems\dto\LeaveRequestDto.class
 com\quickems\dto\auth\LoginRequest.class
 com\quickems\repository\UserRepository.class
-com\quickems\entity\User.class
 com\quickems\dto\LeaveRequestCreate.class
 com\quickems\dto\LeaveRequestDto$LeaveRequestDtoBuilder.class
 com\quickems\entity\Employee$EmployeeBuilder.class

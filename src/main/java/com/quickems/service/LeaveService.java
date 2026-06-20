@@ -13,6 +13,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -23,6 +24,7 @@ public class LeaveService {
     private final LeaveRequestRepository leaveRequestRepository;
     private final EmployeeRepository employeeRepository;
 
+    @Transactional(readOnly = true)
     public Page<LeaveRequestDto> getAllLeaveRequests(LeaveStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("appliedAt").descending());
         if (status != null) {
@@ -31,11 +33,13 @@ public class LeaveService {
         return leaveRequestRepository.findAll(pageable).map(this::toDto);
     }
 
+    @Transactional(readOnly = true)
     public Page<LeaveRequestDto> getLeaveRequestsByEmployee(Long employeeId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("appliedAt").descending());
         return leaveRequestRepository.findByEmployeeId(employeeId, pageable).map(this::toDto);
     }
 
+    @Transactional(readOnly = true)
     public LeaveRequestDto getLeaveRequestById(Long id) {
         return toDto(findById(id));
     }
@@ -70,7 +74,19 @@ public class LeaveService {
         leave.setStatus(status);
         leave.setReviewComment(comment);
         leave.setReviewedAt(LocalDateTime.now());
-        return toDto(leaveRequestRepository.save(leave));
+        leaveRequestRepository.save(leave);
+
+        // If approved and the leave period includes today, set employee status to ON_LEAVE
+        if (status == LeaveStatus.APPROVED) {
+            LocalDate today = LocalDate.now();
+            if (!today.isBefore(leave.getStartDate()) && !today.isAfter(leave.getEndDate())) {
+                Employee emp = leave.getEmployee();
+                emp.setStatus(com.quickems.enums.EmploymentStatus.ON_LEAVE);
+                employeeRepository.save(emp);
+            }
+        }
+
+        return toDto(leave);
     }
 
     @Transactional

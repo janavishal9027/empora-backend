@@ -5,10 +5,10 @@ V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quicke
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\entity\LeaveRequest.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\repository\UserRepository.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\security\JwtAuthenticationFilter.java
+V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\entity\Users.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\config\SecurityConfig.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\service\AuthService.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\entity\Department.java
-V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\entity\User.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\dto\auth\LoginRequest.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\dto\DashboardStats.java
 V:\Project Worksapce\Employee Management system\Backend\src\main\java\com\quickems\service\DepartmentService.java

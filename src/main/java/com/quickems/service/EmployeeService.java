@@ -33,7 +33,7 @@ public class EmployeeService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<EmployeeDto> getAllEmployees(String search, Long departmentId, EmploymentStatus status,
                                              int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
@@ -62,6 +62,7 @@ public class EmployeeService {
         return employeeRepository.findAll(pageable).map(this::toDto);
     }
 
+    @Transactional(readOnly = true)
     public EmployeeDto getEmployeeById(Long id) {
         return toDto(findById(id));
     }
@@ -168,10 +169,10 @@ public class EmployeeService {
 
     /**
      * Admin generates a new temporary password for an employee whose temp password has expired.
-     * Returns the plain-text temp password so admin can share it with the employee.
+     * Auto-generates a secure password and returns the plain text.
      */
     @Transactional
-    public String generateTemporaryPassword(Long employeeId, String newTempPassword) {
+    public String generateTemporaryPassword(Long employeeId) {
         Employee employee = findById(employeeId);
         Users user = userRepository.findByEmail(employee.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("No user account found for employee"));
@@ -179,9 +180,8 @@ public class EmployeeService {
         if (user.isPasswordSet()) {
             throw new IllegalStateException("This employee has already set a permanent password. Temp password not needed.");
         }
-        if (user.isTempPasswordActive()) {
-            throw new IllegalStateException("A temporary password is still active for this employee. Wait for it to expire first.");
-        }
+
+        String newTempPassword = generateSecurePassword();
 
         user.setTemporaryPassword(newTempPassword);
         user.setTempPasswordExpiry(LocalDateTime.now().plusHours(TEMP_PASSWORD_HOURS));

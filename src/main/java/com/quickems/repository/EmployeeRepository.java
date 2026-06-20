@@ -23,6 +23,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     long countByStatus(EmploymentStatus status);
     long countByDepartmentId(Long departmentId);
 
+    long countByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
+
     // ── Derived queries instead of custom JPQL for simple filters ──────────
     @EntityGraph(attributePaths = {"department"})
     Page<Employee> findByDepartmentIdAndStatus(Long departmentId, EmploymentStatus status, Pageable pageable);
